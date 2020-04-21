@@ -29,36 +29,40 @@ This script prints out a formatted line of the weather, based on the contents of
 
 ### Usage
 weather-summary [UNIT_OPTIONS] -f "[FORMAT_STRING]"
+
 UNIT_OPTIONS (all optional, units default to metric system and 24h clock):
-**-C | -F | -K**      temperature units (Celsius, Fahrenheit, Kelvin)
-**-P | -H**           pressure units (hPa, mmHg)
-**-S | -m | -k**      speed units (m/s, m.p.h., km/h)
-**-M | -i**           precipitation measurement units (mm, in)
-**-4 | -2**           sunrise/sunset time format (24h, 12h)
+
+**-C | -F | -K**      temperature units (Celsius, Fahrenheit, Kelvin)    
+**-P | -H**           pressure units (hPa, mmHg)    
+**-S | -m | -k**      speed units (m/s, m.p.h., km/h)    
+**-M | -i**           precipitation measurement units (mm, in)    
+**-4 | -2**           sunrise/sunset time format (24h, 12h)    
+
 FORMAT FLAG:
- **-f** "FORMAT" where                                                
-       %C = location                                           
-       %c = country
-       %T = description
-       %I = description icon
-       %S = sunrise time 
-       %s = sunset time
-       %R = sunrise icon
-       %r = sunset icon
-       %t = temperature
-       %h = maximum temperature
-       %l = minimum temperature
-       %H = humidity
-       %f = "feels like" temperature
-       %w = wind speed
-       %D = wind compass direction
-       %d = wind direction in degrees
-       %P = preciptation
-       %p = precipation measurement 
-       %u = pressure
-       %B = Beaufort wind scale
-       %b = Beaufort wind scale icon
-       %M = moon phase
+
+ **-f** "FORMAT" where    
+       %C = location    
+       %c = country    
+       %T = description    
+       %I = description icon    
+       %S = sunrise time    
+       %s = sunset time    
+       %R = sunrise icon    
+       %r = sunset icon    
+       %t = temperature    
+       %h = maximum temperature    
+       %l = minimum temperature    
+       %H = humidity    
+       %f = "feels like" temperature    
+       %w = wind speed    
+       %D = wind compass direction    
+       %d = wind direction in degrees    
+       %P = preciptation    
+       %p = precipation measurement    
+       %u = pressure    
+       %B = Beaufort wind scale    
+       %b = Beaufort wind scale icon    
+       %M = moon phase    
        %m = moon phase icon
 
 ### Examples
