@@ -4,4 +4,4 @@ UNITS="metric"
 API="https://api.openweathermap.org/data/2.5"
 LAT="$(python geoclue-py.py | awk '{ print $1 }')"
 LON="$(python geoclue-py.py | awk '{ print $2 }')"
-curl -sf "$API/weather?appid=$KEY&lat=$LAT&lon=$LON&mode=xml&units=$UNITS" -o ~/wm.xml
+curl -sf "$API/weather?appid=$KEY&lat=$LAT&lon=$LON&mode=xml&units=$UNITS" -o ~/.local/share/wm.xml
