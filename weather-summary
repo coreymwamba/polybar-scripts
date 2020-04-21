@@ -209,30 +209,30 @@ echo $formatted | sed -r  -e "s/\%C/$C/g" -e "s/\%c/$c/g" -e "s/\%u/$pressure/g"
 
 #################################################################
 # Options:                                                      #
-# -C | -F | -K                                                  #
-# -Pa | -Hg                                                     #
-# -ms | -mph | -kmh                                             #
-# -mm | -in                                                     #
-# -24 | -12                                                     #
-# -f "..." where                                                #
+# -C | -F | -K temperature in Celsius, Fahrenheit, or Kelvin    #
+# -P | -H      pressure in hPa or mmHg                          #
+# -S | -m | -k speed in m/s, m.p.h. or km/h                     #
+# -M | -I precipitation in mm or in                             #
+# -4 | -2 24 or 12 hour display                                 #
+# -f "..." formatted display, where                             #
 #       %C = location                                           #
 #       %c = country                                            #
 #       %T = description                                        #
 #       %I = description icon                                   #
-#       %S = sunrise time (24H; use -12 to change)              #
-#       %s = sunset time (24H)                                  #
+#       %S = sunrise time (use -2 or -4)                        #
+#       %s = sunset time (use -2 or -4)                         #
 #       %R = sunrise icon                                       #
 #       %r = sunset icon                                        #
-#       %t = temperature (in °C; use -F or -K to change)        #
-#       %h = maximum temperature                                #
-#       %l = minimum temperature                                #
-#       %f = "feels like" temperature                           #
-#       %w = wind speed (in m/s; use -mph or -kmh to change)    #
+#       %t = temperature (use -C, -F or -K)                     #
+#       %h = maximum temperature (use -C, -F or -K)             #
+#       %l = minimum temperature (use -C, -F or -K)             #
+#       %f = "feels like" temperature(use -C, -F or -K)         #
+#       %w = wind speed (use -S, -m or -k)                      #
 #       %D = wind compass direction                             #
 #       %d = wind direction in degrees                          #
 #       %P = preciptation                                       #
-#       %p = precipation measurement (in mm; use -in to change) #
-#       %u = pressure (in hPa; use -Hg to change)               #
+#       %p = precipation measurement (use -M or -I)             #
+#       %u = pressure (use -P or -H)                            #
 #       %B = Beaufort wind scale                                #
 #       %b = Beaufort wind scale icon                           #
 #       %M = moon phase (rough calculation)                     #
