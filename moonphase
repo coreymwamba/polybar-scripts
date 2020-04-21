@@ -1,9 +1,10 @@
 #!/bin/bash
 # moonphase
 # sources:
-# 1) https://gist.github.com/zuloo/f2fed0de6ddbc0d25e2e -- with numbers that I don't understand
+# 1) https://gist.github.com/zuloo/f2fed0de6ddbc0d25e2e -- with numbers that I didn't understand
 # 2) https://stackoverflow.com/questions/43317428/bash-how-to-get-current-julian-day-number 
 # 3) The explanation of the lunar phase calculation on Wikipedia
+# 4) https://erikflowers.github.io/weather-icons/ -- Weather Icons font
 #
 # This script writes the next new moon date to a file (~/.local/share/moonphase.txt) 
 # and then uses THAT date for the calculation over the next 29/30 days.
