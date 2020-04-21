@@ -1,0 +1,229 @@
+#!/bin/bash
+
+get_icon() {
+    case $1 in
+        # Icons for weather-icons
+        01d) icon="";;
+        01n) icon="";;
+        02d) icon="";;
+        02n) icon="";;
+        03*) icon="";;
+        04*) icon="";;
+        09d) icon="";;
+        09n) icon="";;
+        10d) icon="";;
+        10n) icon="";;
+        11d) icon="";;
+        11n) icon="";;
+        13d) icon="";;
+        13n) icon="";;
+        50d) icon="";;
+        50n) icon="";;
+        *) icon="";;
+
+    esac
+
+    echo $icon
+}
+
+
+get_Beaufort_icon(){
+	case "$1" in
+	"Calm") bs="";;
+	"Light Air") bs="";;
+	"Light breeze"|"Light Breeze") bs="";;
+	"Gentle Breeze") bs="";;
+	"Moderate breeze"|"Moderate Breeze") bs="";;
+	"Fresh Breeze") bs="";;
+	"Strong breeze"|"Strong Breeze") bs="";;
+	"Near Gale"|"High wind, near gale") bs="";;
+	"Gale") bs="";;
+	"Strong Gale"|"Severe Gale") bs="";;
+	"Storm") bs="";;
+	"Violent Storm") bs="";;
+	"Hurricane") bs="";;
+	esac
+	echo $bs
+}
+
+#########################################################################
+# openweathermap does not use 'Light Air'; uses 'Severe Gale' rather    #
+# than 'Strong Gale'; and has 'High wind, near gale' for 'Near Gale.'   #
+# I can't find openweathermap's classification anywhere else, so I did  #
+# not use it. The below function uses the original classifcations and   #
+# works with m.p.h. ($wsmph)                                            #
+#########################################################################
+
+trueBeaufort(){
+sw=$1
+if [[ $sw -lt 1  ]]; then
+beaufort="Calm"
+elif [[ $sw -ge 1 && $sw -le 3 ]]; then
+beaufort="Light Air"
+elif [[ $sw -ge 4 && $sw -le 7 ]]; then
+beaufort="Light Breeze"
+elif [[ $sw -ge 8 && $sw -le 12 ]]; then
+beaufort="Gentle Breeze"
+elif [[ $sw -ge 13 && $sw -le 18 ]]; then
+beaufort="Moderate Breeze"
+elif [[ $sw -ge 19 && $sw -le 24 ]]; then
+beaufort="Fresh Breeze"
+elif [[ $sw -ge 25 && $sw -le 31 ]]; then
+beaufort="Strong Breeze"
+elif [[ $sw -ge 32 && $sw -le 38 ]]; then
+beaufort="Near Gale"
+elif [[ $sw -ge 39 && $sw -le 46 ]]; then
+beaufort="Gale"
+elif [[ $sw -ge 47 && $sw -le 54 ]]; then
+beaufort="Strong Gale"
+elif [[ $sw -ge 55 && $sw -le 63 ]]; then
+beaufort="Storm"
+elif [[ $sw -ge 64 && $sw -le 72 ]]; then
+beaufort="Violent Storm"
+else beaufort="Hurricane"
+fi
+echo $beaufort
+}
+
+#sunrise and sunset icons
+R=""
+r=""
+
+tempf(){
+    genius --exec="round((($1 * 9)/5) + 32)"
+	    }
+
+tempk(){
+    genius --exec="$1 - 273.15"
+      }
+mph(){
+genius --exec="round(($1 * 2.2369362920544))"
+}
+
+kph(){
+genius --exec="round(($1 * 3.6))"
+}
+
+inches(){
+  genius --exec="round(($1 / 25.4))"
+  }
+
+
+pHg(){
+genius --exec="round(($1 * 0.75))"
+}
+
+tempc=$(xmllint --xpath 'string(//temperature/@value)' ~/wm.xml)
+fltemp=$(xmllint --xpath 'string(//feels_like/@value)' ~/wm.xml)
+maxtemp=$(xmllint --xpath 'string(//temperature/@max)' ~/wm.xml)
+mintemp=$(xmllint --xpath 'string(//temperature/@min)' ~/wm.xml)
+S=$(xmllint --xpath 'string(//sun/@rise)' ~/wm.xml)
+s=$(xmllint --xpath 'string(//sun/@set)' ~/wm.xml)
+t=$(genius --exec="round($tempc)")
+f=$(genius --exec="round($fltemp)")
+l=$(genius --exec="round($mintemp)")
+h=$(genius --exec="round($maxtemp)")
+w=$(xmllint --xpath 'string(//wind/speed/@value)' ~/wm.xml)
+B="$(trueBeaufort $(mph "$w"))"
+b=$(get_Beaufort_icon "$B")
+D="$(xmllint --xpath 'string(//wind/direction/@code)' ~/wm.xml)"
+d=$(xmllint --xpath 'string(//wind/direction/@value)' ~/wm.xml)
+T="$(xmllint --xpath 'string(//weather/@value)' ~/wm.xml)"
+P=$(xmllint --xpath 'string(//precipitation/@mode)' ~/wm.xml)
+p=$(xmllint --xpath 'string(//precipitation/@value)' ~/wm.xml)
+if [[ -z $p ]]; then
+declare -i p=0
+fi
+u=$(xmllint --xpath 'string(//pressure/@value)' ~/wm.xml)
+I=$(get_icon "$(xmllint --xpath 'string(//weather/@icon)' ~/wm.xml)")
+m="$(moonphase|awk '{print $1}')"
+M="$(moonphase|awk '{print $2 " " $3}')"
+
+
+while getopts "PHmSkMi42CFKf:" opt;  do
+case "$opt" in
+P)
+ pressure="$u hPa"
+;;
+H)
+ pressure="$(pHg $u) mmHg"
+;;
+S)
+ windspeed="$w m\/s"
+;;
+m)
+ windspeed="$(mph $w) m.p.h."
+;;
+k)
+ windspeed="$(kph $w) km\/h"
+;;
+M)
+ precipm="$p mm"
+;;
+i)
+ precipm="$(inches "$p") in."
+;;
+
+C)
+ temp="$t°C"
+ mintemp="$h°C"
+ maxtemp="$h°C"
+ feels="$f°C"
+;;
+F)
+ temp="$(tempf $t)°F"
+ mintemp="$(tempf $l)°F"
+ maxtemp="$(tempf $h)°F"
+ feels="$(tempf $f)°F"
+;;
+K)
+ temp="$(tempk $t) K"
+ mintemp="$(tempk $l) K"
+ maxtemp="$(tempk $h) K"
+ feels="$(tempk $f) K"
+;;
+2)
+ sunrise=$(date +"%l:%M%P" -d "$S")
+ sunset=$(date +"%l:%M%P" -d "$s")
+;;
+4)
+ sunrise=$(date +"%H:%M" -d "$S")
+ sunset=$(date +"%H:%M" -d "$s")
+;;
+f)
+formatted=$OPTARG
+;;
+esac
+done
+echo $formatted | sed -r -e "s/\%u/$pressure/g" -e "s/\%t/$temp/g" -e "s/\%l/$mintemp/g" -e "s/\%h/$maxtemp/g" -e "s/\%f/$feels/g" -e "s/\%R/$R/g" -e "s/\%r/$r/g" -e "s/\%S/$sunrise/g" -e "s/\%s/$sunset/g" -e "s/\%w/$windspeed/g" -e "s/\%P/$P/g" -e "s/\%p/$precipm/g" -e "s/\%d/$d/g" -e "s/\%D/$D/g" -e "s/\%B/$B/g" -e "s/\%b/$b/g" -e "s/\%T/$T/g" -e "s/\%I/$I/g" -e "s/\%M/$M/g" -e "s/\%m/$m/g"
+
+#################################################################
+# Options:                                                      #
+# -C | -F | -K                                                  #
+# -Pa | -Hg                                                     #
+# -ms | -mph | -kmh                                             #
+# -mm | -in                                                     #
+# -24 | -12                                                     #
+# -f "..." where                                                #
+# 	%T = description                                        #
+# 	%I = description icon                                   #
+# 	%S = sunrise time (24H; use -12 to change)              #
+# 	%s = sunset time (24H)                                  #
+# 	%R = sunrise icon                                       #
+# 	%r = sunset icon                                        #
+# 	%t = temperature (in °C; use -F or -K to change)        #
+# 	%h = maximum temperature                                #
+# 	%l = minimum temperature                                #
+# 	%f = "feels like" temperature                           #
+# 	%w = wind speed (in m/s; use -mph or -kmh to change)    #
+# 	%D = wind compass direction                             #
+# 	%d = wind direction in degrees                          #
+# 	%P = preciptation                                       #
+# 	%p = precipation measurement (in mm; use -in to change) #
+# 	%u = pressure (in hPa; use -Hg to change)               #
+# 	%B = Beaufort wind scale                                #
+# 	%b = Beaufort wind scale icon                           #
+# 	%M = moon phase (rough calculation)                     #
+# 	%m = moon phase icon                                    #
+#################################################################
+

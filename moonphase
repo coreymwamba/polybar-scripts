@@ -1,0 +1,58 @@
+#!/bin/bash
+# moonphase
+# sources:
+# 1) https://gist.github.com/zuloo/f2fed0de6ddbc0d25e2e -- with numbers that I don't understand
+# 2) https://stackoverflow.com/questions/43317428/bash-how-to-get-current-julian-day-number 
+# 3) The explanation of the lunar phase calculation on Wikipedia
+#
+# This script writes the next new moon date to a file (~/.local/share/moonphase.txt) 
+# and then uses THAT date for the calculation over the next 29/30 days.
+# It will need Genius (https://www.jirka.org/genius.html), which is capable of rounding numbers, unlike bc.
+# The reduction variable is not really needed as the number of days is small.
+
+function GetJulianDay # year, month, day
+{
+  year=$1
+  month=$2
+  day=$3
+
+  jd=$((day - 32075 + 1461 * (year + 4800 - (14 - month) / 12) / 4 + 367 * (month - 2 + ((14 - month) / 12) * 12) / 12 - 3 * ((year + 4900 - (14 - month) / 12) / 100) / 4))
+
+  echo $jd
+}
+
+function GetTodayJulianDay
+{
+  year=$(date +"%Y")
+  month=$(date +"%m")
+  day=$(date +"%d")
+
+  todayJd=$(GetJulianDay $year $month $day)
+
+  echo $todayJd
+}
+
+  test -e ~/.local/share/moonphase.txt || echo $(GetJulianDay 2020 3 24) > ~/.local/share/moonphase.txt
+
+  modulo=29.530588853
+  now=$(GetTodayJulianDay)
+  newmoon=$(cat ~/.local/share/moonphase.txt)
+  days=$(genius --exec="$now - $newmoon") # this is the "age" of the moon
+  reduction=$(genius --exec="$days - ($modulo * ($days / $modulo))") # this is a modulo calculation
+                                                                     # and yes, the bracketed part
+								     # will cancel out for small numbers
+                                                                     # but it is included for completeness
+  phase=$(genius --exec="$days - round($reduction)")
+  if [ $phase -lt 2 ]; then phase_icon=" New Moon"
+  elif [ $phase -lt 8 ];  then phase_icon=" Waxing Crescent"
+  elif [ $phase -lt 12 ];  then phase_icon=" First Quarter"
+  elif [ $phase -lt 15 ];  then phase_icon=" Waxing Gibbous"
+  elif [ $phase -lt 17 ];  then phase_icon=" Full Moon"
+  elif [ $phase -lt 21 ]; then phase_icon=" Waning Gibbous"
+  elif [ $phase -lt 23 ]; then phase_icon=" Last Quarter"
+  elif [ $phase -lt 29 ]; then phase_icon=" Waning Crescent"
+  elif [ $phase -eq 29 ]; then phase_icon=" New Moon" && echo $now > $newmoonfile
+  else
+    phase_icon=""  # new
+  fi
+  echo "$phase_icon $phase"

@@ -1,0 +1,8 @@
+#!/bin/sh
+KEY="82296c224b075960f8aa5cde50d2e172"
+CITY=
+UNITS="metric"
+API="https://api.openweathermap.org/data/2.5"
+LAT="$(python bin/geoclue-py.py | awk '{ print $1 }')"
+LON="$(python bin/geoclue-py.py | awk '{ print $2 }')"
+curl -sf "$API/weather?appid=$KEY&lat=$LAT&lon=$LON&mode=xml&units=$UNITS" -o ~/wm.xml
