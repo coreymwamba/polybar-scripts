@@ -57,7 +57,7 @@ get_Beaufort_icon(){
 # than 'Strong Gale'; and has 'High wind, near gale' for 'Near Gale.'   #
 # I can't find openweathermap's classification anywhere else, so I did  #
 # not use it. The below function uses the original classifcations and   #
-# works with m.p.h. ($wsmph)                                            #
+# works with m.p.h.                                                     #
 #########################################################################
 
 trueBeaufort(){
@@ -149,7 +149,7 @@ m="$(moonphase|awk '{print $1}')"
 M="$(moonphase|awk '{print $2 " " $3}')"
 
 
-while getopts "PHmSkMi42CFKf:" opt;  do
+while getopts "?PHmSkMi42CFKf:" opt;  do
 case "$opt" in
 P)
  u="$u hPa"
@@ -202,40 +202,46 @@ K)
 f)
 formatted=$OPTARG
 ;;
+?)
+cat <<HELPTEXT
+weather-summary [UNIT_OPTIONS] -f "[FORMAT_STRING]"
+
+UNIT_OPTIONS (all optional, units default to metric system and 24h clock):
+
+-C | -F | -K      temperature units (Celsius, Fahrenheit, Kelvin)    
+-P | -H           pressure units (hPa, mmHg)    
+-S | -m | -k      speed units (m/s, m.p.h., km/h)    
+-M | -i           precipitation measurement units (mm, in)    
+-4 | -2           sunrise/sunset time format (24h, 12h)    
+
+FORMAT FLAG:
+
+ -f "FORMAT" where    
+       %C = location    
+       %c = country    
+       %T = description    
+       %I = description icon    
+       %S = sunrise time    
+       %s = sunset time    
+       %R = sunrise icon    
+       %r = sunset icon    
+       %t = temperature    
+       %h = maximum temperature    
+       %l = minimum temperature    
+       %H = humidity    
+       %f = "feels like" temperature    
+       %w = wind speed    
+       %D = wind compass direction    
+       %d = wind direction in degrees    
+       %P = preciptation    
+       %p = precipation measurement    
+       %u = pressure    
+       %B = Beaufort wind scale    
+       %b = Beaufort wind scale icon    
+       %M = moon phase    
+       %m = moon phase icon
+HELPTEXT
+;;
 esac
 done
 echo $formatted | sed -r -e "s/\%C/$C/g" -e "s/\%c/$c/g" -e "s/\%H/$H/g" -e "s/\%u/$u/g" -e "s/\%t/$t/g" -e "s/\%l/$l/g" -e "s/\%h/$h/g" -e "s/\%f/$f/g" -e "s/\%R/$R/g" -e "s/\%r/$r/g" -e "s/\%S/$S/g" -e "s/\%s/$s/g" -e "s/\%w/$w/g" -e "s/\%P/$P/g" -e "s/\%p/$p/g" -e "s/\%d/$d/g" -e "s/\%D/$D/g" -e "s/\%B/$B/g" -e "s/\%b/$b/g" -e "s/\%T/$T/g" -e "s/\%I/$I/g" -e "s/\%M/$M/g" -e "s/\%m/$m/g"
-
-#################################################################
-# Options:                                                      #
-# -C | -F | -K                                                  #
-# -Pa | -Hg                                                     #
-# -ms | -mph | -kmh                                             #
-# -mm | -in                                                     #
-# -24 | -12                                                     #
-# -f "..." where                                                #
-#       %C = location                                           #
-#       %c = country                                            #
-# 	%T = description                                        #
-# 	%I = description icon                                   #
-# 	%S = sunrise time (24H; use -12 to change)              #
-# 	%s = sunset time (24H)                                  #
-# 	%R = sunrise icon                                       #
-# 	%r = sunset icon                                        #
-# 	%t = temperature (in °C; use -F or -K to change)        #
-# 	%h = maximum temperature                                #
-# 	%l = minimum temperature                                #
-#       %H = humidity                                           #
-# 	%f = "feels like" temperature                           #
-# 	%w = wind speed (in m/s; use -mph or -kmh to change)    #
-# 	%D = wind compass direction                             #
-# 	%d = wind direction in degrees                          #
-# 	%P = preciptation                                       #
-# 	%p = precipation measurement (in mm; use -in to change) #
-# 	%u = pressure (in hPa; use -Hg to change)               #
-# 	%B = Beaufort wind scale                                #
-# 	%b = Beaufort wind scale icon                           #
-# 	%M = moon phase (rough calculation)                     #
-# 	%m = moon phase icon                                    #
-#################################################################
-
