@@ -2,6 +2,8 @@
 The scripts in this repository all work in a system for my [polybar](https://polybar.github.io/).
 The `geoclue-py` script pulls in a location. This is used by `get_weather`, which produces an XML file with data from OpenWeatherMap. This XML file is then used by `weather-summary`, which also uses `moonphase`.
 
+![a visual example of the polybar module](https://github.com/coreymwamba/polybar-scripts/blob/master/grab-1587460628.jpg)
+
 ## Requirements
 + An [Openweathermap API key](https://openweathermap.org/api)
 + Geoclue(https://gitlab.freedesktop.org/geoclue/geoclue)
