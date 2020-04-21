@@ -1,13 +1,11 @@
 #!/bin/bash
-# source: 
-# https://github.com/polybar/polybar-scripts/tree/master/polybar-scripts/openweathermap-fullfeatured
-# But I didn't like it; so this is HEAVILY modified. No Awesome fonts; sorry.
+# source: https://github.com/polybar/polybar-scripts/tree/master/polybar-scripts/openweathermap-fullfeatured
+# this is HEAVILY modified. No Awesome fonts; sorry.
 # You will need 
-# get_weather --> in the repo this script came from. This actually pulls in the weather and dumps it into an XML file
-# genius (https://www.jirka.org/genius.html) because 
-# **you shouldn't have to write a function to round a number with a maths program (bc)**
+# get_weather --> in this repo. This actually pulls in the weather
+# genius
 # xmllint --> you get more weather with XML
-# 
+
 get_icon() {
     case $1 in
         # Icons for weather-icons
@@ -121,31 +119,32 @@ pHg(){
 genius --exec="round(($1 * 0.75))"
 }
 
-tempc=$(xmllint --xpath 'string(//temperature/@value)' ~/.local/share/wm.xml)
-fltemp=$(xmllint --xpath 'string(//feels_like/@value)' ~/.local/share/wm.xml)
-maxtemp=$(xmllint --xpath 'string(//temperature/@max)' ~/.local/share/wm.xml)
-mintemp=$(xmllint --xpath 'string(//temperature/@min)' ~/.local/share/wm.xml)
-S=$(xmllint --xpath 'string(//sun/@rise)' ~/.local/share/wm.xml)
-s=$(xmllint --xpath 'string(//sun/@set)' ~/.local/share/wm.xml)
+tempc=$(xmllint --xpath 'string(//temperature/@value)' ~/wm.xml)
+fltemp=$(xmllint --xpath 'string(//feels_like/@value)' ~/wm.xml)
+maxtemp=$(xmllint --xpath 'string(//temperature/@max)' ~/wm.xml)
+mintemp=$(xmllint --xpath 'string(//temperature/@min)' ~/wm.xml)
+S=$(xmllint --xpath 'string(//sun/@rise)' ~/wm.xml)
+s=$(xmllint --xpath 'string(//sun/@set)' ~/wm.xml)
 t=$(genius --exec="round($tempc)")
 f=$(genius --exec="round($fltemp)")
 l=$(genius --exec="round($mintemp)")
 h=$(genius --exec="round($maxtemp)")
-w=$(xmllint --xpath 'string(//wind/speed/@value)' ~/.local/share/wm.xml)
+w=$(xmllint --xpath 'string(//wind/speed/@value)' ~/wm.xml)
 B="$(trueBeaufort $(mph "$w"))"
 b=$(get_Beaufort_icon "$B")
-D="$(xmllint --xpath 'string(//wind/direction/@code)' ~/.local/share/wm.xml)"
-d=$(xmllint --xpath 'string(//wind/direction/@value)' ~/.local/share/wm.xml)
-T="$(xmllint --xpath 'string(//weather/@value)' ~/.local/share/wm.xml)"
-P=$(xmllint --xpath 'string(//precipitation/@mode)' ~/.local/share/wm.xml)
-p=$(xmllint --xpath 'string(//precipitation/@value)' ~/.local/share/wm.xml)
+D="$(xmllint --xpath 'string(//wind/direction/@code)' ~/wm.xml)"
+d=$(xmllint --xpath 'string(//wind/direction/@value)' ~/wm.xml)
+T="$(xmllint --xpath 'string(//weather/@value)' ~/wm.xml)"
+P=$(xmllint --xpath 'string(//precipitation/@mode)' ~/wm.xml)
+p=$(xmllint --xpath 'string(//precipitation/@value)' ~/wm.xml)
 if [[ -z $p ]]; then
 declare -i p=0
 fi
-C=$(xmllint --xpath 'string(//city/@name)' ~/.local/share/wm.xml)
-c=$(xmllint --xpath 'string(//country)' ~/.local/share/wm.xml)
-u=$(xmllint --xpath 'string(//pressure/@value)' ~/.local/share/wm.xml)
-I=$(get_icon "$(xmllint --xpath 'string(//weather/@icon)' ~/.local/share/wm.xml)")
+C=$(xmllint --xpath 'string(//city/@name)' ~/wm.xml)
+c=$(xmllint --xpath 'string(//country)' ~/wm.xml)
+u=$(xmllint --xpath 'string(//pressure/@value)' ~/wm.xml)
+H=$(xmllint --xpath 'string(//humidity/@value)' ~/wm.xml)
+I=$(get_icon "$(xmllint --xpath 'string(//weather/@icon)' ~/wm.xml)")
 m="$(moonphase|awk '{print $1}')"
 M="$(moonphase|awk '{print $2 " " $3}')"
 
@@ -153,89 +152,90 @@ M="$(moonphase|awk '{print $2 " " $3}')"
 while getopts "PHmSkMi42CFKf:" opt;  do
 case "$opt" in
 P)
- pressure="$u hPa"
+ u="$u hPa"
 ;;
 H)
- pressure="$(pHg $u) mmHg"
+ u="$(pHg $u) mmHg"
 ;;
 S)
- windspeed="$w m\/s"
+ w="$w m\/s"
 ;;
 m)
- windspeed="$(mph $w) m.p.h."
+ w="$(mph $w) m.p.h."
 ;;
 k)
- windspeed="$(kph $w) km\/h"
+ w="$(kph $w) km\/h"
 ;;
 M)
- precipm="$p mm"
+ p="$p mm"
 ;;
 i)
- precipm="$(inches "$p") in."
+ p="$(inches "$p") in."
 ;;
 
 C)
- temp="$t°C"
- mintemp="$h°C"
- maxtemp="$h°C"
- feels="$f°C"
+ t="$t°C"
+ l="$h°C"
+ h="$h°C"
+ f="$f°C"
 ;;
 F)
  temp="$(tempf $t)°F"
- mintemp="$(tempf $l)°F"
- maxtemp="$(tempf $h)°F"
- feels="$(tempf $f)°F"
+ l="$(tempf $l)°F"
+ h="$(tempf $h)°F"
+ f="$(tempf $f)°F"
 ;;
 K)
- temp="$(tempk $t) K"
- mintemp="$(tempk $l) K"
- maxtemp="$(tempk $h) K"
- feels="$(tempk $f) K"
+ t="$(tempk $t) K"
+ l="$(tempk $l) K"
+ h="$(tempk $h) K"
+ f="$(tempk $f) K"
 ;;
 2)
- sunrise=$(date +"%l:%M%P" -d "$S")
- sunset=$(date +"%l:%M%P" -d "$s")
+ S=$(date +"%l:%M%P" -d "$S")
+ s=$(date +"%l:%M%P" -d "$s")
 ;;
 4)
- sunrise=$(date +"%H:%M" -d "$S")
- sunset=$(date +"%H:%M" -d "$s")
+ S=$(date +"%H:%M" -d "$S")
+ s=$(date +"%H:%M" -d "$s")
 ;;
 f)
 formatted=$OPTARG
 ;;
 esac
 done
-echo $formatted | sed -r  -e "s/\%C/$C/g" -e "s/\%c/$c/g" -e "s/\%u/$pressure/g" -e "s/\%t/$temp/g" -e "s/\%l/$mintemp/g" -e "s/\%h/$maxtemp/g" -e "s/\%f/$feels/g" -e "s/\%R/$R/g" -e "s/\%r/$r/g" -e "s/\%S/$sunrise/g" -e "s/\%s/$sunset/g" -e "s/\%w/$windspeed/g" -e "s/\%P/$P/g" -e "s/\%p/$precipm/g" -e "s/\%d/$d/g" -e "s/\%D/$D/g" -e "s/\%B/$B/g" -e "s/\%b/$b/g" -e "s/\%T/$T/g" -e "s/\%I/$I/g" -e "s/\%M/$M/g" -e "s/\%m/$m/g"
+echo $formatted | sed -r -e "s/\%C/$C/g" -e "s/\%c/$c/g" -e "s/\%H/$H/g" -e "s/\%u/$u/g" -e "s/\%t/$t/g" -e "s/\%l/$l/g" -e "s/\%h/$h/g" -e "s/\%f/$f/g" -e "s/\%R/$R/g" -e "s/\%r/$r/g" -e "s/\%S/$S/g" -e "s/\%s/$s/g" -e "s/\%w/$w/g" -e "s/\%P/$P/g" -e "s/\%p/$p/g" -e "s/\%d/$d/g" -e "s/\%D/$D/g" -e "s/\%B/$B/g" -e "s/\%b/$b/g" -e "s/\%T/$T/g" -e "s/\%I/$I/g" -e "s/\%M/$M/g" -e "s/\%m/$m/g"
 
 #################################################################
 # Options:                                                      #
-# -C | -F | -K temperature in Celsius, Fahrenheit, or Kelvin    #
-# -P | -H      pressure in hPa or mmHg                          #
-# -S | -m | -k speed in m/s, m.p.h. or km/h                     #
-# -M | -I precipitation in mm or in                             #
-# -4 | -2 24 or 12 hour display                                 #
-# -f "..." formatted display, where                             #
+# -C | -F | -K                                                  #
+# -Pa | -Hg                                                     #
+# -ms | -mph | -kmh                                             #
+# -mm | -in                                                     #
+# -24 | -12                                                     #
+# -f "..." where                                                #
 #       %C = location                                           #
 #       %c = country                                            #
-#       %T = description                                        #
-#       %I = description icon                                   #
-#       %S = sunrise time (use -2 or -4)                        #
-#       %s = sunset time (use -2 or -4)                         #
-#       %R = sunrise icon                                       #
-#       %r = sunset icon                                        #
-#       %t = temperature (use -C, -F or -K)                     #
-#       %h = maximum temperature (use -C, -F or -K)             #
-#       %l = minimum temperature (use -C, -F or -K)             #
-#       %f = "feels like" temperature(use -C, -F or -K)         #
-#       %w = wind speed (use -S, -m or -k)                      #
-#       %D = wind compass direction                             #
-#       %d = wind direction in degrees                          #
-#       %P = preciptation                                       #
-#       %p = precipation measurement (use -M or -I)             #
-#       %u = pressure (use -P or -H)                            #
-#       %B = Beaufort wind scale                                #
-#       %b = Beaufort wind scale icon                           #
-#       %M = moon phase (rough calculation)                     #
-#       %m = moon phase icon                                    #
+# 	%T = description                                        #
+# 	%I = description icon                                   #
+# 	%S = sunrise time (24H; use -12 to change)              #
+# 	%s = sunset time (24H)                                  #
+# 	%R = sunrise icon                                       #
+# 	%r = sunset icon                                        #
+# 	%t = temperature (in °C; use -F or -K to change)        #
+# 	%h = maximum temperature                                #
+# 	%l = minimum temperature                                #
+#       %H = humidity                                           #
+# 	%f = "feels like" temperature                           #
+# 	%w = wind speed (in m/s; use -mph or -kmh to change)    #
+# 	%D = wind compass direction                             #
+# 	%d = wind direction in degrees                          #
+# 	%P = preciptation                                       #
+# 	%p = precipation measurement (in mm; use -in to change) #
+# 	%u = pressure (in hPa; use -Hg to change)               #
+# 	%B = Beaufort wind scale                                #
+# 	%b = Beaufort wind scale icon                           #
+# 	%M = moon phase (rough calculation)                     #
+# 	%m = moon phase icon                                    #
 #################################################################
 
