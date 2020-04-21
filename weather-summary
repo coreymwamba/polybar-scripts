@@ -1,5 +1,13 @@
 #!/bin/bash
-
+# source: 
+# https://github.com/polybar/polybar-scripts/tree/master/polybar-scripts/openweathermap-fullfeatured
+# But I didn't like it; so this is HEAVILY modified. No Awesome fonts; sorry.
+# You will need 
+# get_weather --> in the repo this script came from. This actually pulls in the weather and dumps it into an XML file
+# genius (https://www.jirka.org/genius.html) because 
+# **you shouldn't have to write a function to round a number with a maths program (bc)**
+# xmllint --> you get more weather with XML
+# 
 get_icon() {
     case $1 in
         # Icons for weather-icons
@@ -134,6 +142,8 @@ p=$(xmllint --xpath 'string(//precipitation/@value)' ~/wm.xml)
 if [[ -z $p ]]; then
 declare -i p=0
 fi
+C=$(xmllint --xpath 'string(//city/@name)' ~/wm.xml)
+c=$(xmllint --xpath 'string(//country)' ~/wm.xml)
 u=$(xmllint --xpath 'string(//pressure/@value)' ~/wm.xml)
 I=$(get_icon "$(xmllint --xpath 'string(//weather/@icon)' ~/wm.xml)")
 m="$(moonphase|awk '{print $1}')"
@@ -195,7 +205,7 @@ formatted=$OPTARG
 ;;
 esac
 done
-echo $formatted | sed -r -e "s/\%u/$pressure/g" -e "s/\%t/$temp/g" -e "s/\%l/$mintemp/g" -e "s/\%h/$maxtemp/g" -e "s/\%f/$feels/g" -e "s/\%R/$R/g" -e "s/\%r/$r/g" -e "s/\%S/$sunrise/g" -e "s/\%s/$sunset/g" -e "s/\%w/$windspeed/g" -e "s/\%P/$P/g" -e "s/\%p/$precipm/g" -e "s/\%d/$d/g" -e "s/\%D/$D/g" -e "s/\%B/$B/g" -e "s/\%b/$b/g" -e "s/\%T/$T/g" -e "s/\%I/$I/g" -e "s/\%M/$M/g" -e "s/\%m/$m/g"
+echo $formatted | sed -r  -e "s/\%C/$C/g" -e "s/\%c/$c/g" -e "s/\%u/$pressure/g" -e "s/\%t/$temp/g" -e "s/\%l/$mintemp/g" -e "s/\%h/$maxtemp/g" -e "s/\%f/$feels/g" -e "s/\%R/$R/g" -e "s/\%r/$r/g" -e "s/\%S/$sunrise/g" -e "s/\%s/$sunset/g" -e "s/\%w/$windspeed/g" -e "s/\%P/$P/g" -e "s/\%p/$precipm/g" -e "s/\%d/$d/g" -e "s/\%D/$D/g" -e "s/\%B/$B/g" -e "s/\%b/$b/g" -e "s/\%T/$T/g" -e "s/\%I/$I/g" -e "s/\%M/$M/g" -e "s/\%m/$m/g"
 
 #################################################################
 # Options:                                                      #
@@ -205,25 +215,27 @@ echo $formatted | sed -r -e "s/\%u/$pressure/g" -e "s/\%t/$temp/g" -e "s/\%l/$mi
 # -mm | -in                                                     #
 # -24 | -12                                                     #
 # -f "..." where                                                #
-# 	%T = description                                        #
-# 	%I = description icon                                   #
-# 	%S = sunrise time (24H; use -12 to change)              #
-# 	%s = sunset time (24H)                                  #
-# 	%R = sunrise icon                                       #
-# 	%r = sunset icon                                        #
-# 	%t = temperature (in °C; use -F or -K to change)        #
-# 	%h = maximum temperature                                #
-# 	%l = minimum temperature                                #
-# 	%f = "feels like" temperature                           #
-# 	%w = wind speed (in m/s; use -mph or -kmh to change)    #
-# 	%D = wind compass direction                             #
-# 	%d = wind direction in degrees                          #
-# 	%P = preciptation                                       #
-# 	%p = precipation measurement (in mm; use -in to change) #
-# 	%u = pressure (in hPa; use -Hg to change)               #
-# 	%B = Beaufort wind scale                                #
-# 	%b = Beaufort wind scale icon                           #
-# 	%M = moon phase (rough calculation)                     #
-# 	%m = moon phase icon                                    #
+#       %C = location                                           #
+#       %c = country                                            #
+#       %T = description                                        #
+#       %I = description icon                                   #
+#       %S = sunrise time (24H; use -12 to change)              #
+#       %s = sunset time (24H)                                  #
+#       %R = sunrise icon                                       #
+#       %r = sunset icon                                        #
+#       %t = temperature (in °C; use -F or -K to change)        #
+#       %h = maximum temperature                                #
+#       %l = minimum temperature                                #
+#       %f = "feels like" temperature                           #
+#       %w = wind speed (in m/s; use -mph or -kmh to change)    #
+#       %D = wind compass direction                             #
+#       %d = wind direction in degrees                          #
+#       %P = preciptation                                       #
+#       %p = precipation measurement (in mm; use -in to change) #
+#       %u = pressure (in hPa; use -Hg to change)               #
+#       %B = Beaufort wind scale                                #
+#       %b = Beaufort wind scale icon                           #
+#       %M = moon phase (rough calculation)                     #
+#       %m = moon phase icon                                    #
 #################################################################
 
