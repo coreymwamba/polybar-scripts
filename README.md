@@ -4,6 +4,8 @@ The `geoclue-py` script pulls in a location. This is used by `get_weather`, whic
 
 ![a visual example of the polybar module](https://github.com/coreymwamba/polybar-scripts/blob/master/grab-1587460628.jpg)
 
+You could probably use the scripts in other bars, or Conky.
+
 ## Requirements
 + An [Openweathermap API key](https://openweathermap.org/api)
 + Geoclue(https://gitlab.freedesktop.org/geoclue/geoclue)
