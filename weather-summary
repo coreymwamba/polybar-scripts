@@ -180,7 +180,7 @@ C)
  f="$f°C"
 ;;
 F)
- temp="$(tempf $t)°F"
+ t="$(tempf $t)°F"
  l="$(tempf $l)°F"
  h="$(tempf $h)°F"
  f="$(tempf $f)°F"
