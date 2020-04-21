@@ -121,31 +121,31 @@ pHg(){
 genius --exec="round(($1 * 0.75))"
 }
 
-tempc=$(xmllint --xpath 'string(//temperature/@value)' ~/wm.xml)
-fltemp=$(xmllint --xpath 'string(//feels_like/@value)' ~/wm.xml)
-maxtemp=$(xmllint --xpath 'string(//temperature/@max)' ~/wm.xml)
-mintemp=$(xmllint --xpath 'string(//temperature/@min)' ~/wm.xml)
-S=$(xmllint --xpath 'string(//sun/@rise)' ~/wm.xml)
-s=$(xmllint --xpath 'string(//sun/@set)' ~/wm.xml)
+tempc=$(xmllint --xpath 'string(//temperature/@value)' ~/.local/share/wm.xml)
+fltemp=$(xmllint --xpath 'string(//feels_like/@value)' ~/.local/share/wm.xml)
+maxtemp=$(xmllint --xpath 'string(//temperature/@max)' ~/.local/share/wm.xml)
+mintemp=$(xmllint --xpath 'string(//temperature/@min)' ~/.local/share/wm.xml)
+S=$(xmllint --xpath 'string(//sun/@rise)' ~/.local/share/wm.xml)
+s=$(xmllint --xpath 'string(//sun/@set)' ~/.local/share/wm.xml)
 t=$(genius --exec="round($tempc)")
 f=$(genius --exec="round($fltemp)")
 l=$(genius --exec="round($mintemp)")
 h=$(genius --exec="round($maxtemp)")
-w=$(xmllint --xpath 'string(//wind/speed/@value)' ~/wm.xml)
+w=$(xmllint --xpath 'string(//wind/speed/@value)' ~/.local/share/wm.xml)
 B="$(trueBeaufort $(mph "$w"))"
 b=$(get_Beaufort_icon "$B")
-D="$(xmllint --xpath 'string(//wind/direction/@code)' ~/wm.xml)"
-d=$(xmllint --xpath 'string(//wind/direction/@value)' ~/wm.xml)
-T="$(xmllint --xpath 'string(//weather/@value)' ~/wm.xml)"
-P=$(xmllint --xpath 'string(//precipitation/@mode)' ~/wm.xml)
-p=$(xmllint --xpath 'string(//precipitation/@value)' ~/wm.xml)
+D="$(xmllint --xpath 'string(//wind/direction/@code)' ~/.local/share/wm.xml)"
+d=$(xmllint --xpath 'string(//wind/direction/@value)' ~/.local/share/wm.xml)
+T="$(xmllint --xpath 'string(//weather/@value)' ~/.local/share/wm.xml)"
+P=$(xmllint --xpath 'string(//precipitation/@mode)' ~/.local/share/wm.xml)
+p=$(xmllint --xpath 'string(//precipitation/@value)' ~/.local/share/wm.xml)
 if [[ -z $p ]]; then
 declare -i p=0
 fi
-C=$(xmllint --xpath 'string(//city/@name)' ~/wm.xml)
-c=$(xmllint --xpath 'string(//country)' ~/wm.xml)
-u=$(xmllint --xpath 'string(//pressure/@value)' ~/wm.xml)
-I=$(get_icon "$(xmllint --xpath 'string(//weather/@icon)' ~/wm.xml)")
+C=$(xmllint --xpath 'string(//city/@name)' ~/.local/share/wm.xml)
+c=$(xmllint --xpath 'string(//country)' ~/.local/share/wm.xml)
+u=$(xmllint --xpath 'string(//pressure/@value)' ~/.local/share/wm.xml)
+I=$(get_icon "$(xmllint --xpath 'string(//weather/@icon)' ~/.local/share/wm.xml)")
 m="$(moonphase|awk '{print $1}')"
 M="$(moonphase|awk '{print $2 " " $3}')"
 
