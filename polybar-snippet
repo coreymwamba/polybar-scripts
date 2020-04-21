@@ -1,0 +1,16 @@
+; drop these into your existing polybar config
+; set the font first
+[bar/NameOfExistingBar]
+font-2 = Weather Icons:size=12;1
+
+; then you can call the module below
+[module/weather]
+type = custom/script
+; this is what I use, but obviously you can change it
+; make sure the path is correct
+exec = ~/bin/weather-summary -2PCf "%R%S %m%s | %I %t (%f) | %b %D %u"
+interval = 60
+label-font = 3
+label-padding = 2
+;uncomment the line below to allow custom data refreshes 
+;double-click-left = ~/bin/get_weather
