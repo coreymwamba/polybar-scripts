@@ -52,7 +52,10 @@ function GetTodayJulianDay
   elif [ $phase -lt 21 ]; then phase_icon=" Waning Gibbous"
   elif [ $phase -lt 23 ]; then phase_icon=" Last Quarter"
   elif [ $phase -lt 29 ]; then phase_icon=" Waning Crescent"
-  elif [ $phase -eq 29 ]; then phase_icon=" New Moon" && echo $now > $newmoonfile
+  elif [ $phase -eq 29 ]; then 
+        phase_icon=" New Moon"  
+        oldmoon=$(cat ~/.local/share/moonphase.txt) 
+        if [ $now -gt $oldmoon ]; then echo $now > ~/.local/share/moonphase.txt; fi
   else
     phase_icon=""  # new
   fi
