@@ -25,9 +25,8 @@ function GetJulianDay # year, month, day
 function GetTodayJulianDay
 {
   year=$(date +"%Y")
-  month=$(date +"%m")
-  day=$(date +"%d")
-
+  month=$(date +"%_m")
+  day=$(date +"%_d") 
   todayJd=$(GetJulianDay $year $month $day)
 
   echo $todayJd
