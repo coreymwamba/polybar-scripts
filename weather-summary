@@ -9,47 +9,43 @@
 get_icon() {
     case $1 in
         # Icons for weather-icons
-        01d) icon="";;
-        01n) icon="";;
-        02d) icon="";;
-        02n) icon="";;
-        03*) icon="";;
-        04*) icon="";;
-        09d) icon="";;
-        09n) icon="";;
-        10d) icon="";;
-        10n) icon="";;
-        11d) icon="";;
-        11n) icon="";;
-        13d) icon="";;
-        13n) icon="";;
-        50d) icon="";;
-        50n) icon="";;
-        *) icon="";;
+        01d) icon="\uF00D";;
+        01n) icon="\uF02E";;
+        02d) icon="\uF002";;
+        02n) icon="\uF086";;
+        03*) icon="\uF041";;
+        04*) icon="\uF013";;
+        09*) icon="\uF019";;
+        10d) icon="\uF008";;
+        10n) icon="\uF028";;
+        11*) icon="\uF016";;
+        13*) icon="\uF064";;
+        50*) icon="\uF014";;
+        *) icon="\uF07B";;
 
     esac
 
-    echo $icon
+    echo -e $icon
 }
 
 
 get_Beaufort_icon(){
 	case "$1" in
-	"Calm") bs="";;
-	"Light Air") bs="";;
-	"Light breeze"|"Light Breeze") bs="";;
-	"Gentle Breeze") bs="";;
-	"Moderate breeze"|"Moderate Breeze") bs="";;
-	"Fresh Breeze") bs="";;
-	"Strong breeze"|"Strong Breeze") bs="";;
-	"Near Gale"|"High wind, near gale") bs="";;
-	"Gale") bs="";;
-	"Strong Gale"|"Severe Gale") bs="";;
-	"Storm") bs="";;
-	"Violent Storm") bs="";;
-	"Hurricane") bs="";;
+	"Calm") bs="\uF0B7";;
+	"Light Air") bs="\uF0B8";;
+	"Light breeze"|"Light Breeze") bs="\uF0B9";;
+	"Gentle Breeze") bs="\uF0BA";;
+	"Moderate breeze"|"Moderate Breeze") bs="\uF0BB";;
+	"Fresh Breeze") bs="\uF0BC";;
+	"Strong breeze"|"Strong Breeze") bs="\uF0BD";;
+	"Near Gale"|"High wind, near gale") bs="\uF0BE";;
+	"Gale") bs="\uF0BF";;
+	"Strong Gale"|"Severe Gale") bs="\uF0C0";;
+	"Storm") bs="\uF0C1";;
+	"Violent Storm") bs="\uF0C2";;
+	"Hurricane") bs="\uF0C3";;
 	esac
-	echo $bs
+	echo -e $bs
 }
 
 #########################################################################
@@ -57,7 +53,7 @@ get_Beaufort_icon(){
 # than 'Strong Gale'; and has 'High wind, near gale' for 'Near Gale.'   #
 # I can't find openweathermap's classification anywhere else, so I did  #
 # not use it. The below function uses the original classifcations and   #
-# works with m.p.h.                                                     #
+# works with m.p.h. ($wsmph)                                            #
 #########################################################################
 
 trueBeaufort(){
@@ -118,35 +114,39 @@ inches(){
 pHg(){
 genius --exec="round(($1 * 0.75))"
 }
-
-tempc=$(xmllint --xpath 'string(//temperature/@value)' ~/wm.xml)
-fltemp=$(xmllint --xpath 'string(//feels_like/@value)' ~/wm.xml)
-maxtemp=$(xmllint --xpath 'string(//temperature/@max)' ~/wm.xml)
-mintemp=$(xmllint --xpath 'string(//temperature/@min)' ~/wm.xml)
-S=$(xmllint --xpath 'string(//sun/@rise)' ~/wm.xml)
-s=$(xmllint --xpath 'string(//sun/@set)' ~/wm.xml)
+tz=$(xmllint --xpath 'string(//timezone)' ~/.local/share/wm.xml)
+tempc=$(xmllint --xpath 'string(//temperature/@value)' ~/.local/share/wm.xml)
+fltemp=$(xmllint --xpath 'string(//feels_like/@value)' ~/.local/share/wm.xml)
+maxtemp=$(xmllint --xpath 'string(//temperature/@max)' ~/.local/share/wm.xml)
+mintemp=$(xmllint --xpath 'string(//temperature/@min)' ~/.local/share/wm.xml)
+_S=$(date +"%s" -d "$(xmllint --xpath 'string(//sun/@rise)' ~/.local/share/wm.xml)")
+S=$(genius --exec="$_S + $tz")
+S=$(date -Iseconds -d "@$S")
+_s=$(date +"%s" -d "$(xmllint --xpath 'string(//sun/@set)' ~/.local/share/wm.xml)")
+s=$(genius --exec="$_s + $tz")
+s=$(date -Iseconds -d "@$s")
 t=$(genius --exec="round($tempc)")
 f=$(genius --exec="round($fltemp)")
 l=$(genius --exec="round($mintemp)")
 h=$(genius --exec="round($maxtemp)")
-w=$(xmllint --xpath 'string(//wind/speed/@value)' ~/wm.xml)
+w=$(xmllint --xpath 'string(//wind/speed/@value)' ~/.local/share/wm.xml)
 B="$(trueBeaufort $(mph "$w"))"
 b=$(get_Beaufort_icon "$B")
-D="$(xmllint --xpath 'string(//wind/direction/@code)' ~/wm.xml)"
-d=$(xmllint --xpath 'string(//wind/direction/@value)' ~/wm.xml)
-T="$(xmllint --xpath 'string(//weather/@value)' ~/wm.xml)"
-P=$(xmllint --xpath 'string(//precipitation/@mode)' ~/wm.xml)
-p=$(xmllint --xpath 'string(//precipitation/@value)' ~/wm.xml)
+D="$(xmllint --xpath 'string(//wind/direction/@code)' ~/.local/share/wm.xml)"
+d=$(xmllint --xpath 'string(//wind/direction/@value)' ~/.local/share/wm.xml)
+T="$(xmllint --xpath 'string(//weather/@value)' ~/.local/share/wm.xml)"
+P=$(xmllint --xpath 'string(//precipitation/@mode)' ~/.local/share/wm.xml)
+p=$(xmllint --xpath 'string(//precipitation/@value)' ~/.local/share/wm.xml)
 if [[ -z $p ]]; then
 declare -i p=0
 fi
-C=$(xmllint --xpath 'string(//city/@name)' ~/wm.xml)
-c=$(xmllint --xpath 'string(//country)' ~/wm.xml)
-u=$(xmllint --xpath 'string(//pressure/@value)' ~/wm.xml)
-H=$(xmllint --xpath 'string(//humidity/@value)' ~/wm.xml)
-I=$(get_icon "$(xmllint --xpath 'string(//weather/@icon)' ~/wm.xml)")
-m="$(moonphase|awk '{print $1}')"
-M="$(moonphase|awk '{print $2 " " $3}')"
+C=$(xmllint --xpath 'string(//city/@name)' ~/.local/share/wm.xml)
+c=$(xmllint --xpath 'string(//country)' ~/.local/share/wm.xml)
+u=$(xmllint --xpath 'string(//pressure/@value)' ~/.local/share/wm.xml)
+H=$(xmllint --xpath 'string(//humidity/@value)' ~/.local/share/wm.xml)
+I=$(get_icon "$(xmllint --xpath 'string(//weather/@icon)' ~/.local/share/wm.xml)")
+m="$(moonphase -i)"
+M="$(moonphase -t)"
 
 
 while getopts "?PHmSkMi42CFKf:" opt;  do
@@ -170,7 +170,8 @@ M)
  p="$p mm"
 ;;
 i)
- p="$(inches "$p") in."
+ p="$(inches "$p")"
+# units="in."
 ;;
 
 C)
@@ -208,11 +209,11 @@ weather-summary [UNIT_OPTIONS] -f "[FORMAT_STRING]"
 
 UNIT_OPTIONS (all optional, units default to metric system and 24h clock):
 
--C | -F | -K      temperature units (Celsius, Fahrenheit, Kelvin)    
--P | -H           pressure units (hPa, mmHg)    
--S | -m | -k      speed units (m/s, m.p.h., km/h)    
--M | -i           precipitation measurement units (mm, in)    
--4 | -2           sunrise/sunset time format (24h, 12h)    
+-C | -F | -K    temperature units (Celsius, Fahrenheit, Kelvin)    
+-P | -H         pressure units (hPa, mmHg)    
+-S | -m | -k    speed units (m/s, m.p.h., km/h)    
+-M | -i         precipitation measurement units (mm, in)    
+-4 | -2         sunrise/sunset time format (24h, 12h)    
 
 FORMAT FLAG:
 
