@@ -1,61 +1,94 @@
-#!/bin/bash
+#!/bin/sh
 # moonphase
-# sources:
-# 1) https://gist.github.com/zuloo/f2fed0de6ddbc0d25e2e -- with numbers that I didn't understand
-# 2) https://stackoverflow.com/questions/43317428/bash-how-to-get-current-julian-day-number 
-# 3) The explanation of the lunar phase calculation on Wikipedia
-# 4) https://erikflowers.github.io/weather-icons/ -- Weather Icons font
-#
-# This script writes the next new moon date to a file (~/.local/share/moonphase.txt) 
-# and then uses THAT date for the calculation over the next 29/30 days.
-# It will need Genius (https://www.jirka.org/genius.html), which is capable of rounding numbers, unlike bc.
-# The reduction variable is not really needed as the number of days is small.
+originmoon=$(date +%s -d "2021-04-12 02:30 GMT")
+now=$(date +%s)
+lunarday=29.5305877076
+modulo=$(genius --exec="$lunarday * (24 * 60 * 60)")
+seconds=$(genius --exec="$now - $originmoon")
+current=$(genius --exec="$seconds mod IntegerPart($modulo)")
+fraction=$(genius --exec="$current / $modulo")
+phase=$(genius --exec="round($fraction * $lunarday)")
+lunation=$(genius --exec="round(100 * $fraction)")
+case $phase in
+1|29)
+icon="\uF095";;
+2)
+icon="\uF096";;
+3)
+icon="\uF097";;
+4)
+icon="\uF098";;
+5)
+icon="\uF099";;
+6)
+icon="\uF09A";;
+7)
+icon="\uF09B";;
+8)
+icon="\uF09C";;
+9)
+icon="\uF09D";;
+10)
+icon="\uF09E";;
+11)
+icon="\uF09F";;
+12)
+icon="\uF0A0";;
+13)
+icon="\uF0A1";;
+14)
+icon="\uF0A2";;
+15)
+icon="\uF0A3";;
+16)
+icon="\uF0A4";;
+17)
+icon="\uF0A5";;
+18)
+icon="\uF0A6";;
+19)
+icon="\uF0A7";;
+20)
+icon="\uF0A8";;
+21)
+icon="\uF0A9";;
+22)
+icon="\uF0AA";;
+23)
+icon="\uF0AB";;
+24)
+icon="\uF0AC";;
+25)
+icon="\uF0AD";;
+26)
+icon="\uF0AE";;
+27)
+icon="\uF0A9";;
+28)
+icon="\uF0B0";;
+esac
 
-function GetJulianDay # year, month, day
-{
-  year=$1
-  month=$2
-  day=$3
 
-  jd=$((day - 32075 + 1461 * (year + 4800 - (14 - month) / 12) / 4 + 367 * (month - 2 + ((14 - month) / 12) * 12) / 12 - 3 * ((year + 4900 - (14 - month) / 12) / 100) / 4))
+  if [ $lunation -le 2 ]; then phase_text="New Moon"
+  elif [ $lunation -lt 25 ];  then phase_text="Waxing Crescent"
+  elif [ $lunation -le 26 ];  then phase_text="First Quarter"
+  elif [ $lunation -lt 49 ];  then phase_text="Waxing Gibbous"
+  elif [ $lunation -le 51 ];  then phase_text="Full Moon"
+  elif [ $lunation -lt 75 ]; then phase_text="Waning Gibbous"
+  elif [ $lunation -le 76 ]; then phase_text="Last Quarter"
+  elif [ $lunation -lt 100 ]; then phase_text="Waning Crescent"
+  elif [ $lunation -eq  100 ]; then phase_text="New Moon"
 
-  echo $jd
-}
-
-function GetTodayJulianDay
-{
-  year=$(date +"%Y")
-  month=$(date +"%_m")
-  day=$(date +"%_d") 
-  todayJd=$(GetJulianDay $year $month $day)
-
-  echo $todayJd
-}
-
-  test -e ~/.local/share/moonphase.txt || echo $(GetJulianDay 2020 3 24) > ~/.local/share/moonphase.txt
-
-  modulo=29.530588853
-  now=$(GetTodayJulianDay)
-  newmoon=$(cat ~/.local/share/moonphase.txt)
-  days=$(genius --exec="$now - $newmoon") # this is the "age" of the moon
-  reduction=$(genius --exec="$days - ($modulo * ($days / $modulo))") # this is a modulo calculation
-                                                                     # and yes, the bracketed part
-								     # will cancel out for small numbers
-                                                                     # but it is included for completeness
-  phase=$(genius --exec="$days - round($reduction)")
-  if [ $phase -lt 2 ]; then phase_icon=" New Moon"
-  elif [ $phase -lt 8 ];  then phase_icon=" Waxing Crescent"
-  elif [ $phase -lt 12 ];  then phase_icon=" First Quarter"
-  elif [ $phase -lt 15 ];  then phase_icon=" Waxing Gibbous"
-  elif [ $phase -lt 17 ];  then phase_icon=" Full Moon"
-  elif [ $phase -lt 21 ]; then phase_icon=" Waning Gibbous"
-  elif [ $phase -lt 23 ]; then phase_icon=" Last Quarter"
-  elif [ $phase -lt 29 ]; then phase_icon=" Waning Crescent"
-  elif [ $phase -eq 29 ]; then 
-        phase_icon=" New Moon"  
-        oldmoon=$(cat ~/.local/share/moonphase.txt) 
-        if [ $now -gt $oldmoon ]; then echo $now > ~/.local/share/moonphase.txt; fi
   else
-    phase_icon=""  # new
+    phase_text="New Moon"  # new
   fi
-  echo "$phase_icon $phase"
+case $1 in
+-i|-icon)
+echo -e $icon;;
+-t|-text)
+echo $phase_text;;
+-l|-lunation)
+echo "$lunation%";;
+*)
+ echo -e "$phase_text $icon  $phase $lunation%";;
+esac
